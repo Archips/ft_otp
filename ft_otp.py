@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 
+import os
+import re
 import argparse
 
 def parse_arguments():
@@ -14,10 +16,38 @@ def parse_arguments():
 
     return args
 
+
+def is_valid_hex_key(key):
+    
+    pattern = re.compile(r'^[0-9a-fA-F]{64}$')
+    return bool(pattern.match(key))
+
+def check_hex(key):
+
+    if is_valid_hex_key(key):
+        return True
+    else:
+        try:
+            with open(key) as k:
+                if k:
+                    secret = k.read()
+                    if is_valid_hex_key(secret):
+                        return True
+        except:
+            return False
+    return False
+
+def check_key(key):
+
+    if key.endswith(".key") and os.access(key, os.R_OK):
+        return True
+    return False
+
 if __name__ == "__main__":
 
     args = parse_arguments()
 
-    print("hello")
-    print(args.g)
-    print(args.k)
+    if args.g and check_hex(args.g):
+        print(True)
+    if args.k and check_key(args.k):
+        print(True)
