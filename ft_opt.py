@@ -7,6 +7,7 @@ import math
 import time
 import hashlib
 import argparse
+from pathlib import Path
 from cryptography.fernet import Fernet
 
 def parse_arguments():
@@ -57,7 +58,7 @@ def fernet_encrypt(key):
             master_key.write(fernet_key)
     except:
         print("ft_opt.py : error : master key coudl not be generated")
-
+        exit(1)
     with open('.master_key.key', 'rb') as key_file:
         master_key = key_file.read()
 
@@ -70,7 +71,7 @@ def fernet_encrypt(key):
             encrypted_file.write(encrypted)
     except:
         print("ft_opt.py : error : encryption failed")
-
+        exit(1)
 
 def fernet_decrypt(encrypt_key):
 
@@ -79,6 +80,7 @@ def fernet_decrypt(encrypt_key):
             fernet_key = master_key.read()
     except:
         print("ft_opt.py : error : invalid master key")
+        exit(1)
 
     fernet = Fernet(fernet_key)
 
@@ -87,8 +89,8 @@ def fernet_decrypt(encrypt_key):
 
     decrypted = fernet.decrypt(encrypted)
 
-    with open('decrypted_key.hex', 'wb') as decrypted_file:
-        decrypted_file.write(decrypted)
+    # with open('decrypted_key.hex', 'wb') as decrypted_file:
+    #     decrypted_file.write(decrypted)
 
 def ft_otp(encrypt_key, len: int = 6):
 
@@ -121,5 +123,8 @@ if __name__ == "__main__":
     if args.g and check_hex(args.g):
         encrypted_hex = check_hex(args.g)
         fernet_encrypt(encrypted_hex)
+        file = Path(args.g)
+        if file.is_file():
+            os.remove(file)
     if args.k and check_key(args.k):
         print(ft_otp(args.k))
