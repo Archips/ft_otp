@@ -68,6 +68,24 @@ def fernet_encrypt(key):
         print("ft_opt.py : error : encryption failed")
 
 
+def fernet_decrypt(encrypt_key):
+
+    try:
+        with open('.master_key.key', 'rb') as master_key:
+            fernet_key = master_key.read()
+    except:
+        print("ft_opt.py : error : invalid master key")
+
+    fernet = Fernet(fernet_key)
+
+    with open(encrypt_key, 'rb') as encrypted_file:
+        encrypted = encrypted_file.read()
+
+    decrypted = fernet.decrypt(encrypted)
+
+    with open('decrypted_key.hex', 'wb') as decrypted_file:
+        decrypted_file.write(decrypted)
+
 if __name__ == "__main__":
 
     args = parse_arguments()
@@ -76,4 +94,4 @@ if __name__ == "__main__":
         encrypted_hex = check_hex(args.g)
         fernet_encrypt(encrypted_hex)
     if args.k and check_key(args.k):
-        print(True)
+        fernet_decrypt(args.k)
