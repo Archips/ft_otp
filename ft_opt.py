@@ -3,6 +3,7 @@
 import os
 import re
 import argparse
+from cryptography.fernet import Fernet
 
 def parse_arguments():
     parser = argparse.ArgumentParser()
@@ -25,17 +26,17 @@ def is_valid_hex_key(key):
 def check_hex(key):
 
     if is_valid_hex_key(key):
-        return True
+        return key
     else:
         try:
             with open(key) as k:
                 if k:
                     secret = k.read()
                     if is_valid_hex_key(secret):
-                        return True
+                        return secret
         except:
-            return False
-    return False
+            print("ft_opt.py : error : invalid")
+    print("ft_opt.py : error : invalid")
 
 def check_key(key):
 
@@ -43,11 +44,36 @@ def check_key(key):
         return True
     return False
 
+def fernet_encrypt(key):
+
+    fernet_key = Fernet.generate_key()
+
+    try:
+        with open('.master_key.key', 'wb') as master_key:
+            master_key.write(fernet_key)
+    except:
+        print("ft_opt.py : error : master key coudl not be generated")
+
+    with open('.master_key.key', 'rb') as key_file:
+        master_key = key_file.read()
+
+    fernet = Fernet(master_key)
+
+    encrypted = fernet.encrypt(bytes(key, 'utf-8'))
+
+    try:
+        with open('ft_opt.key', 'wb') as encrypted_file:
+            encrypted_file.write(encrypted)
+    except:
+        print("ft_opt.py : error : encryption failed")
+
+
 if __name__ == "__main__":
 
     args = parse_arguments()
 
     if args.g and check_hex(args.g):
-        print(True)
+        encrypted_hex = check_hex(args.g)
+        fernet_encrypt(encrypted_hex)
     if args.k and check_key(args.k):
         print(True)
