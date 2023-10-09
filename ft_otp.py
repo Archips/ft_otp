@@ -55,7 +55,9 @@ def check_hex(key):
                         return secret
         except:
             print("ft_otp.py : error : invalid")
+            exit(1)
     print("ft_otp.py : error : invalid")
+    exit(1)
 
 def check_key(key):
 
